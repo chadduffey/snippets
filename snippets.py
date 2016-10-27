@@ -1,6 +1,7 @@
+import argparse
 import logging
 
-logging.basicConfig(filename="snippets.log, level=logging.DEBUG")
+logging.basicConfig(filename="snippets.log", level=logging.DEBUG)
 
 def put(name, snippet):
     """
@@ -14,6 +15,7 @@ def put(name, snippet):
 
     return name, snippet
 
+
 def get(name):
     """
     Retrieve snippet with a given name
@@ -21,7 +23,18 @@ def get(name):
     :return: snippet
     """
 
-    logging.error("FIXME: Unimplemented - put({!r}, {!r})".format(name))
+    logging.error("FIXME: Unimplemented - put({!r})".format(name))
 
     return ""
 
+
+def main():
+    """
+    Main Function
+    """
+    logging.info("Constructing parser")
+    parser = argparse.ArgumentParser(description="Store and retrieve snippets of text")
+    arguments = parser.parse_args()
+
+if __name__ == "__main__":
+    main()
