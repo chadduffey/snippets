@@ -42,6 +42,10 @@ def main():
     put_parser.add_argument("name", help="name of the snippet")
     put_parser.add_argument("snippet", help="snippet text")
 
+    logging.debug("Constructing a get subparser")
+    get_parser = subparsers.add_parser("get", help="Retrieve a snippet")
+    get_parser.add_argument("name", help="name of the snippet to retrieve")
+
     arguments = parser.parse_args()
 
 
