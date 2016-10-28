@@ -17,10 +17,15 @@ def put(name, snippet):
     """
 
     logging.info("Storing snippet {!r}: {!r}".format(name, snippet))
-    cursor = connection.cursor()
-    command = "insert into snippets values (%s, %s)"
-    cursor.execute(command, (name, snippet))
-    connection.commit()
+
+    with connection, connection.cursor() as cursor:
+        try:
+            cursor.execute("insert into snippets values (%s, %s)", (name, snippet))
+        except:
+            connection.rollback()
+            cursor.execute("update snippets set message=%s where keyword=%s", (snippet, name))
+        connection.commit()
+
     logging.debug("Snippet stored succesfully.")
 
     return name, snippet
@@ -34,11 +39,9 @@ def get(name):
     """
 
     logging.info("Retrieving snippet {!r}".format(name))
-    cursor = connection.cursor()
-    command = "select * from snippets where keyword = (%s)"
-    cursor.execute(command, (name,))
-    result = cursor.fetchone()
-    connection.commit()
+    with connection, connection.cursor() as cursor:
+        cursor.execute("select message from snippets where keyword=%s", (name,))
+        result = cursor.fetchone()
 
     if not result:
         return "404: Snippet not found"
