@@ -26,7 +26,7 @@ def put(name, snippet):
             cursor.execute("update snippets set message=%s where keyword=%s", (snippet, name))
         connection.commit()
 
-    logging.debug("Snippet stored succesfully.")
+    logging.debug("Snippet stored successfully.")
 
     return name, snippet
 
@@ -39,6 +39,7 @@ def get(name):
     """
 
     logging.info("Retrieving snippet {!r}".format(name))
+
     with connection, connection.cursor() as cursor:
         cursor.execute("select message from snippets where keyword=%s", (name,))
         result = cursor.fetchone()
@@ -46,7 +47,25 @@ def get(name):
     if not result:
         return "404: Snippet not found"
 
+    logging.info("Retrieved snippet {!r}".format(name))
+
     return result[0]
+
+def catalog():
+    """
+    See all of the current snippets
+    :return: all of the current inventory in a tuple
+    """
+    logging.info("Retrieving the entire catalog")
+
+    with connection, connection.cursor() as cursor:
+        cursor.execute("select * from snippets")
+        result = cursor.fetchall()
+
+    if not result:
+        return "no items retrieved from database"
+
+    return result
 
 
 def main():
@@ -67,6 +86,9 @@ def main():
     get_parser = subparsers.add_parser("get", help="Retrieve a snippet")
     get_parser.add_argument("name", help="name of the snippet to retrieve")
 
+    logging.debug("Constructing a catalog subparser")
+    catalog_parser = subparsers.add_parser("catalog", help="Retrieve all snippets")
+
     arguments = parser.parse_args()
 
     #convert the Namespace object to a dictionary
@@ -80,6 +102,9 @@ def main():
     elif command == "get":
         snippet = get(**arguments)
         print("Retrieved snippet: {!r}".format(snippet))
+    elif command == "catalog":
+        for k, v in catalog():
+            print(k + '\t[' + v + ']')
 
 
 if __name__ == "__main__":
