@@ -33,9 +33,13 @@ def get(name):
     :return: snippet
     """
 
-    logging.error("FIXME: Unimplemented - put({!r})".format(name))
+    logging.info("Retrieving snippet {!r}".format(name))
+    cursor = connection.cursor()
+    command = "select * from snippets where keyword = (%s)"
+    cursor.execute(command, (name,))
+    result = cursor.fetchone()
 
-    return ""
+    return result
 
 
 def main():
