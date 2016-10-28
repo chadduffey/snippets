@@ -16,7 +16,12 @@ def put(name, snippet):
     :return: name and the snippet
     """
 
-    logging.error("FIXME: Unimplemented - put({!r}, {!r})".format(name, snippet))
+    logging.info("Storing snippet {!r}: {!r}".format(name, snippet))
+    cursor = connection.cursor()
+    command = "insert into snippets values (%s, %s)"
+    cursor.execute(command, (name, snippet))
+    connection.commit()
+    logging.debug("Snippet stored succesfully.")
 
     return name, snippet
 
@@ -64,8 +69,6 @@ def main():
     elif command == "get":
         snippet = get(**arguments)
         print("Retrieved snippet: {!r}".format(snippet))
-
-
 
 
 if __name__ == "__main__":
