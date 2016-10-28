@@ -30,7 +30,7 @@ def get(name):
     """
     Retrieve snippet with a given name
     :param name: name of snippet to retrieve
-    :return: snippet
+    :return: snippet or not found message
     """
 
     logging.info("Retrieving snippet {!r}".format(name))
@@ -38,8 +38,12 @@ def get(name):
     command = "select * from snippets where keyword = (%s)"
     cursor.execute(command, (name,))
     result = cursor.fetchone()
+    connection.commit()
 
-    return result
+    if not result:
+        return "404: Snippet not found"
+
+    return result[0]
 
 
 def main():
