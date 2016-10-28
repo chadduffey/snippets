@@ -51,6 +51,7 @@ def get(name):
 
     return result[0]
 
+
 def catalog():
     """
     See all of the current snippets
@@ -63,7 +64,28 @@ def catalog():
         result = cursor.fetchall()
 
     if not result:
-        return "no items retrieved from database"
+        return False
+
+    logging.info("Retrieved the entire catalog")
+
+    return result
+
+
+def search(value):
+    """
+    Find snippets containing the search value
+    :param value: the value to search for in the database
+    :return: items matching the search criteria in a tuple
+    """
+    logging.info("Searching for {!r}".format(value))
+
+    with connection, connection.cursor() as cursor:
+        query = "SELECT * FROM snippets WHERE message LIKE '%" + value + "%'"
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+    if not result:
+        return False
 
     return result
 
@@ -89,9 +111,13 @@ def main():
     logging.debug("Constructing a catalog subparser")
     catalog_parser = subparsers.add_parser("catalog", help="Retrieve all snippets")
 
+    logging.debug("Constructing a search subparser")
+    search_parser = subparsers.add_parser("search", help="Find snippets with keyword")
+    search_parser.add_argument("value", help="string of the snippet to find")
+
     arguments = parser.parse_args()
 
-    #convert the Namespace object to a dictionary
+    # convert the Namespace object to a dictionary
     arguments = vars(arguments)
 
     command = arguments.pop("command")
@@ -103,8 +129,15 @@ def main():
         snippet = get(**arguments)
         print("Retrieved snippet: {!r}".format(snippet))
     elif command == "catalog":
-        for k, v in catalog():
-            print(k + '\t[' + v + ']')
+        all_items = catalog()
+        if all_items:
+            for k, v in all_items:
+                print(k + '\t[' + v + ']')
+    elif command == "search":
+        snippets = search(**arguments)
+        if snippets:
+            for k,v in snippets:
+                print(k + '\t[' + v + ']')
 
 
 if __name__ == "__main__":
